@@ -181,7 +181,7 @@ Add Docker setup to run tests without locally installed PHP.
 
 ```bash
 docker build -t uuid-php-test .
-docker run --rm uuid-php-test
+docker run --rm -it -v $(pwd):/app uuid-php-test vendor/bin/phpunit
 ```
 
 ## UUIDv6 Field and Bit Layout

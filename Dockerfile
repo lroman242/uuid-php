@@ -20,6 +20,10 @@ WORKDIR /app
 # Copy project files
 COPY . .
 
+# Register volumes
+VOLUME /app
+VOLUME /app/vendor
+
 # Enable APCu for CLI
 RUN echo "apc.enable_cli=1" >> /usr/local/etc/php/conf.d/docker-php-ext-apcu.ini
 

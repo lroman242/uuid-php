@@ -83,8 +83,8 @@ class UUID
     private static function getUnixTimeSubsec(): array
     {
         $timestamp = microtime(false);
-        $unixts = intval(substr($timestamp, 11), 10);
-        $subsec = intval(substr($timestamp, 2, 7), 10);
+        $unixts = (int)substr($timestamp, 11);
+        $subsec = (int)substr($timestamp, 2, 7);
         $last_unixts = apcu_fetch('unixts');
         $last_subsec = apcu_fetch('subsec');
         if ($last_unixts > $unixts || ($last_unixts === $unixts && $last_subsec >= $subsec)) {
@@ -106,8 +106,8 @@ class UUID
     private static function getUnixTimeMs(): int
     {
         $timestamp = microtime(false);
-        $unixts = intval(substr($timestamp, 11), 10);
-        $unixts_ms = $unixts * 1000 + intval(substr($timestamp, 2, 3), 10);
+        $unixts = (int)substr($timestamp, 11);
+        $unixts_ms = $unixts * 1000 + (int)substr($timestamp, 2, 3);
         $last_unixts_ms = apcu_fetch('unixts_ms');
         if ($last_unixts_ms >= $unixts_ms) {
             $unixts_ms = $last_unixts_ms + 1;
@@ -306,15 +306,15 @@ class UUID
                 $retval = '-';
                 $ts = abs($ts);
             }
-            $retval .= substr_replace(str_pad(strval($ts), 8, '0', \STR_PAD_LEFT), '.', -7, 0);
+            $retval .= substr_replace(str_pad((string)$ts, 8, '0', \STR_PAD_LEFT), '.', -7, 0);
         } elseif ($version === 7) {
             $unixts = hexdec(substr($timehex, 0, 13));
-            $retval = strval($unixts * self::V7_SUBSEC_RANGE);
+            $retval = (string)($unixts * self::V7_SUBSEC_RANGE);
             $retval = substr_replace(str_pad($retval, 8, '0', \STR_PAD_LEFT), '.', -7, 0);
         } elseif ($version === 8) {
             $unixts = hexdec(substr($timehex, 0, 13));
             $subsec = self::decodeSubsec((hexdec(substr($timehex, 13)) << 2) + (hexdec(substr($uuid, 16, 1)) & 0x03));
-            $retval = strval($unixts * self::V8_SUBSEC_RANGE + $subsec);
+            $retval = (string)($unixts * self::V8_SUBSEC_RANGE + $subsec);
             $retval = substr_replace(str_pad($retval, 8, '0', \STR_PAD_LEFT), '.', -7, 0);
         }
         return $retval;
