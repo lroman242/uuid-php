@@ -175,6 +175,15 @@ $uuid_version = UUID::getVersion('2140a926-4a47-465c-b622-4571ad9bb378');
 var_dump($uuid_version); // int(4)
 ```
 
+### Development
+
+Add Docker setup to run tests without locally installed PHP.
+
+```bash
+docker build -t uuid-php-test .
+docker run --rm uuid-php-test
+```
+
 ## UUIDv6 Field and Bit Layout
 
 ```
