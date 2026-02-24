@@ -80,23 +80,16 @@ class UUID
     . '\-?([0-9a-f]{4})\-?([0-9a-f]{4})\-?([0-9a-f]{12})(?(1)\}|)$/i';
 
     /** @internal */
-    private static $unixts = 0;
-
-    /** @internal */
-    private static $subsec = 0;
-
-    /** @internal */
-    private static $unixts_ms = 0;
-
-    /** @internal */
     private static function getUnixTimeSubsec(): array
     {
         $timestamp = microtime(false);
         $unixts = intval(substr($timestamp, 11), 10);
         $subsec = intval(substr($timestamp, 2, 7), 10);
-        if (self::$unixts > $unixts || self::$unixts === $unixts && self::$subsec >= $subsec) {
-            $unixts = self::$unixts;
-            $subsec = self::$subsec;
+        $last_unixts = apcu_fetch('unixts');
+        $last_subsec = apcu_fetch('subsec');
+        if ($last_unixts > $unixts || ($last_unixts === $unixts && $last_subsec >= $subsec)) {
+            $unixts = $last_unixts;
+            $subsec = $last_subsec;
             if ($subsec >= self::SUBSEC_RANGE - 1) {
                 $subsec = 0;
                 $unixts++;
@@ -104,8 +97,8 @@ class UUID
                 $subsec++;
             }
         }
-        self::$unixts = $unixts;
-        self::$subsec = $subsec;
+        apcu_store('unixts', $unixts);
+        apcu_store('subsec', $subsec);
         return [$unixts, $subsec];
     }
 
@@ -115,10 +108,11 @@ class UUID
         $timestamp = microtime(false);
         $unixts = intval(substr($timestamp, 11), 10);
         $unixts_ms = $unixts * 1000 + intval(substr($timestamp, 2, 3), 10);
-        if (self::$unixts_ms >= $unixts_ms) {
-            $unixts_ms = self::$unixts_ms + 1;
+        $last_unixts_ms = apcu_fetch('unixts_ms');
+        if ($last_unixts_ms >= $unixts_ms) {
+            $unixts_ms = $last_unixts_ms + 1;
         }
-        self::$unixts_ms = $unixts_ms;
+        apcu_store('unixts_ms', $unixts_ms);
         return $unixts_ms;
     }
 
